@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>感謝有你的100天</title>
+    <style>
+        :root {
+            --primary-gold: #ffd700;
+            --disney-font: 'Georgia', serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: var(--disney-font);
+        }
+
+        /* --- 場景 1: 密碼場景 --- */
+        #password-scene {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('Gemini_Generated_Image_186xyo186xyo186x.jpg') center/cover no-repeat;
+            z-index: 200;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .password-panel {
+            background: rgba(30, 0, 60, 0.7);
+            padding: 40px 50px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+            text-align: center;
+        }
+
+        .password-panel h2 {
+            color: #fff;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.8);
+            font-size: 1.8rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .digit-input {
+            width: 50px;
+            height: 65px;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid var(--primary-gold);
+            border-radius: 10px;
+            color: var(--primary-gold);
+            font-size: 32px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .digit-input:focus {
+            box-shadow: 0 0 20px var(--primary-gold);
+            transform: scale(1.05);
+        }
+
+        /* --- 場景 2: 舞台與星空 --- */
+        #stage-scene {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: none;
+            background-color: #000;
+        }
+
+        /* 使用指定的圖片作為星空背景 */
+        .stage-background {
+            position: absolute;
+            inset: 0;
+            background: url('Gemini_Generated_Image_186xyo186xyo186x (3).jpg') center/cover no-repeat;
+            z-index: 10;
+        }
+
+        /* 布幕容器 */
+        .curtain-container {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .curtain-half {
+            position: absolute;
+            top: 0;
+            width: 50.5%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 4s cubic-bezier(0.45, 0, 0.55, 1);
+        }
+
+        .curtain-left { left: 0; }
+        .curtain-right { right: 0; }
+
+        .curtain-img {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 200vw;
+            object-fit: cover;
+        }
+
+        .curtain-left .curtain-img { left: 0; }
+        .curtain-right .curtain-img { right: 0; }
+
+        .curtain-left.open { transform: translateX(-100%); }
+        .curtain-right.open { transform: translateX(100%); }
+
+        /* 煙花畫布 */
+        canvas#fireworks {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        /* --- 場景 3: 最終內容 --- */
+        #final-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 150;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        #final-content.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .photo-arch {
+            width: 80vw;
+            max-width: 450px;
+            aspect-ratio: 4 / 5;
+            border-radius: 225px 225px 20px 20px;
+            border: 8px solid #fff;
+            box-shadow: 0 0 70px rgba(255, 215, 0, 0.8);
+            overflow: hidden;
+            position: relative;
+            background: #222;
+        }
+
+        .photo-arch img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .banner-text {
+            margin-top: -35px;
+            z-index: 160;
+            background: linear-gradient(to bottom, #fff7ad, #ffca00);
+            border: 4px solid #fff;
+            border-radius: 60px;
+            padding: 15px 50px;
+            color: #7a0000;
+            font-size: 2.2rem;
+            font-weight: bold;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 600px) {
+            .banner-text { font-size: 1.4rem; padding: 10px 25px; margin-top: -20px; }
+            .photo-arch { width: 90vw; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. 密碼輸入 -->
+    <div id="password-scene">
+        <div class="password-panel">
+            <h2>✨ 請輸入紀念日密碼 ✨</h2>
+            <div class="input-group">
+                <input type="password" maxlength="1" class="digit-input" autofocus>
+                <input type="password" maxlength="1" class="digit-input">
+                <input type="password" maxlength="1" class="digit-input">
+                <input type="password" maxlength="1" class="digit-input">
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 舞台場景 -->
+    <div id="stage-scene">
+        <div class="stage-background"></div>
+        
+        <canvas id="fireworks"></canvas>
+
+        <div class="curtain-container">
+            <div class="curtain-half curtain-left" id="c-left">
+                <img src="Gemini_Generated_Image_186xyo186xyo186x (1).jpg" class="curtain-img">
+            </div>
+            <div class="curtain-half curtain-right" id="c-right">
+                <img src="Gemini_Generated_Image_186xyo186xyo186x (1).jpg" class="curtain-img">
+            </div>
+        </div>
+
+        <!-- 3. 最終展示 (合照) -->
+        <div id="final-content">
+            <div class="photo-arch">
+                <img src="WhatsApp Image 2026-03-29 at 13.35.51.jpeg" alt="我們的合照">
+            </div>
+            <div class="banner-text">感謝有你的100天</div>
+        </div>
+    </div>
+
+    <script>
+        const inputs = document.querySelectorAll('.digit-input');
+        const correctPassword = '1225';
+
+        // 處理輸入邏輯
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                const pw = Array.from(inputs).map(i => i.value).join('');
+                if (pw.length === 4) {
+                    if (pw === correctPassword) {
+                        startSequence();
+                    } else {
+                        setTimeout(() => inputs.forEach(i => i.value = ''), 500);
+                        inputs[0].focus();
+                    }
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        function startSequence() {
+            document.getElementById('password-scene').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('password-scene').style.display = 'none';
+                document.getElementById('stage-scene').style.display = 'block';
+                
+                // 拉開布幕特效
+                setTimeout(() => {
+                    document.getElementById('c-left').classList.add('open');
+                    document.getElementById('c-right').classList.add('open');
+                    initFireworks();
+                }, 300);
+            }, 1500);
+        }
+
+        // --- 煙花系統 (高頻率與大規模版) ---
+        const canvas = document.getElementById('fireworks');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+
+        function initFireworks() {
+            resize();
+            animate();
+            
+            // 提高背景常規煙花的出現頻率 (從 800ms 縮短到 400ms)
+            const interval = setInterval(() => {
+                // 每次觸發隨機生成 1 到 2 個煙花
+                createExplosion(false);
+                if(Math.random() > 0.5) createExplosion(false);
+            }, 400);
+
+            // 5 秒後中央大爆炸，隨後顯示合照
+            setTimeout(() => {
+                // 中央生成三個不同顏色的超大爆炸，讓效果更厚實
+                createExplosion(true);
+                setTimeout(() => createExplosion(true), 200);
+                setTimeout(() => createExplosion(true), 400);
+
+                setTimeout(() => {
+                    document.getElementById('final-content').classList.add('show');
+                }, 1500);
+            }, 5000);
+        }
+
+        class Particle {
+            constructor(x, y, color, speed, angle, size) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.alpha = 1;
+                this.friction = 0.96;
+                this.gravity = 0.04;
+                this.size = size;
+                // 保持 5 秒漸變消失
+                this.decay = 0.0033;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            update() {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+        }
+
+        function createExplosion(isBig) {
+            const x = isBig ? canvas.width / 2 : Math.random() * canvas.width;
+            const y = isBig ? canvas.height * 0.45 : Math.random() * (canvas.height * 0.7);
+            const hue = Math.random() * 360;
+            const color = `hsl(${hue}, 100%, 75%)`;
+            
+            // 粒子數量與大小
+            const count = isBig ? 700 : 250; 
+            const baseSize = isBig ? 5 : 3.5;
+
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * (isBig ? 24 : 12) + 2;
+                particles.push(new Particle(x, y, color, speed, angle, baseSize));
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
