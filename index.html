@@ -65,6 +65,10 @@
         </div>
     </div>
 
+    <audio id="bgm" loop preload="auto">
+        <source src="hanabi.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         const inputs = document.querySelectorAll('.digit-input');
         const correctPassword = '1225'; 
@@ -123,6 +127,9 @@
         function checkPassword() { if (Array.from(inputs).map(i => i.value).join('') === correctPassword) unlock(); }
 
         function unlock() {
+	    const music = document.getElementById('bgm');
+   	    music.play().catch(e => console.log("播放失敗，通常是因為瀏覽器限制:", e));
+
             document.getElementById('password-overlay').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('password-overlay').style.display = 'none';
@@ -134,7 +141,7 @@
 
         const fireworkTimeline = {
              routineInterval: null,
-             RoutineFrequencyMs: 800,
+             RoutineFrequencyMs: 900,
 
              firstWave() {
                 const positions = [
@@ -145,7 +152,7 @@
                 positions.forEach((pos, index) => {
                     const x = canvas.width * pos.x; const y = canvas.height * pos.y;
                     // 速度調整：2300ms (慢速升空)
-                    launchSingleFirework(x, canvas.height, x, y, true, 850, 2300, false, 2.2, 1.0, 0.0075, FireworkColors[index % FireworkColors.length], false);
+                    launchSingleFirework(x, canvas.height, x, y, true, 850, 3500, false, 1.8, 1.0, 0.0075, FireworkColors[index % FireworkColors.length], false);
                 });
                 setTimeout(() => this.launchGrandFinale(), 4500);
              },
@@ -161,7 +168,7 @@
                     const petalTargetY = targetY + Math.sin(angle) * flowerRadius * 0.7;
                     const colorSet = FireworkColors[i % FireworkColors.length];
                     // 速度調整：2300ms (慢速升空)
-                    launchSingleFirework(centerX, canvas.height, targetX, petalTargetY, true, 850, 2300, false, 2.2, 1.0, 0.0075, colorSet, false);
+                    launchSingleFirework(centerX, canvas.height, targetX, petalTargetY, true, 850, 3500, false, 1.8, 1.0, 0.0075, colorSet, false);
                 }
                 setTimeout(() => {
                     document.getElementById('photo-reveal').classList.add('active');
@@ -182,13 +189,13 @@
                         do { picIndex = Math.floor(Math.random() * picImages.length); } while (picIndex === lastPicIndex);
                         lastPicIndex = picIndex;
                         // 速度調整：2000ms
-                        launchSingleFirework(x, canvas.height, x, y, false, 50, 2000, false, 1.0, 1.0, 0.01, getUniqueRandomColor(), picImages[picIndex]);
+                        launchSingleFirework(x, canvas.height, x, y, false, 50, 5000, false, 1.0, 1.0, 0.01, getUniqueRandomColor(), picImages[picIndex]);
                     } else {
                         x = canvas.width * (0.1 + Math.random() * 0.8);
                         y = canvas.height * (0.1 + Math.random() * 0.4);
                         const sizeScale = Math.random() > 0.5 ? 4.0 : 3.2;
                         // 速度調整：3000ms (極慢速)
-                        launchSingleFirework(x, canvas.height, x, y, true, 1100, 3000, false, sizeScale, 0.24, 0.005, getUniqueRandomColor(), false);
+                        launchSingleFirework(x, canvas.height, x, y, true, 1100, 4500, false, sizeScale, 0.24, 0.005, getUniqueRandomColor(), false);
                     }
                 }, this.RoutineFrequencyMs);
              }
