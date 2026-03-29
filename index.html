@@ -3,54 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>感謝有你的100天</title>
+    <title>100 Days With You</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;500&display=swap" rel="stylesheet">
     <style>
         :root {
+            --jp-font: 'Noto Serif JP', serif;
             --primary-gold: #ffd700;
-            --disney-font: 'Georgia', serif;
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
             background-color: #000;
-            font-family: var(--disney-font);
+            font-family: var(--jp-font);
         }
 
-        /* --- 場景 1: 密碼場景 --- */
-        #password-scene {
+        /* --- 1. 密碼頁面 (最上層) --- */
+        #password-overlay {
             position: fixed;
             inset: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: url('Gemini_Generated_Image_186xyo186xyo186x.jpg') center/cover no-repeat;
-            z-index: 200;
-            transition: opacity 1.5s ease-in-out;
+            background: #0a0a0a;
+            z-index: 9999;
+            transition: opacity 1.5s ease;
         }
 
-        .password-panel {
-            background: rgba(30, 0, 60, 0.7);
-            padding: 40px 50px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 215, 0, 0.5);
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+        .password-container {
             text-align: center;
+            color: #fff;
         }
 
-        .password-panel h2 {
-            color: #fff;
-            margin-bottom: 25px;
-            text-shadow: 0 0 15px rgba(255,255,255,0.8);
-            font-size: 1.8rem;
+        .password-container h1 {
+            font-weight: 300;
+            letter-spacing: 0.15rem;
+            margin-bottom: 40px;
+            font-size: 1.6rem;
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .input-group {
@@ -60,11 +58,11 @@
         }
 
         .digit-input {
-            width: 50px;
-            height: 65px;
-            background: rgba(0,0,0,0.6);
-            border: 2px solid var(--primary-gold);
-            border-radius: 10px;
+            width: 45px;
+            height: 60px;
+            background: transparent;
+            border: none;
+            border-bottom: 1.5px solid rgba(255, 255, 255, 0.3);
             color: var(--primary-gold);
             font-size: 32px;
             text-align: center;
@@ -73,188 +71,125 @@
         }
 
         .digit-input:focus {
-            box-shadow: 0 0 20px var(--primary-gold);
-            transform: scale(1.05);
+            border-bottom-color: var(--primary-gold);
+            transform: translateY(-3px);
         }
 
-        /* --- 場景 2: 舞台與星空 --- */
-        #stage-scene {
+        /* --- 2. 主內容層級 --- */
+        #main-content {
             position: fixed;
             inset: 0;
-            z-index: 50;
             display: none;
-            background-color: #000;
-        }
-
-        /* 使用指定的圖片作為星空背景 */
-        .stage-background {
-            position: absolute;
-            inset: 0;
-            background: url('Gemini_Generated_Image_186xyo186xyo186x (3).jpg') center/cover no-repeat;
             z-index: 10;
         }
 
-        /* 布幕容器 */
-        .curtain-container {
+        /* 底層：星空背景 */
+        .sky-background {
             position: absolute;
             inset: 0;
-            z-index: 100;
-            pointer-events: none;
+            background: url('phil-botha-a0TJ3hy-UD8-unsplash.jpg') center/cover no-repeat;
+            z-index: 1;
         }
 
-        .curtain-half {
-            position: absolute;
-            top: 0;
-            width: 50.5%;
-            height: 100%;
-            overflow: hidden;
-            transition: transform 4s cubic-bezier(0.45, 0, 0.55, 1);
-        }
-
-        .curtain-left { left: 0; }
-        .curtain-right { right: 0; }
-
-        .curtain-img {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            width: 200vw;
-            object-fit: cover;
-        }
-
-        .curtain-left .curtain-img { left: 0; }
-        .curtain-right .curtain-img { right: 0; }
-
-        .curtain-left.open { transform: translateX(-100%); }
-        .curtain-right.open { transform: translateX(100%); }
-
-        /* 煙花畫布 */
+        /* 中層：煙花畫布 */
         canvas#fireworks {
             position: absolute;
             inset: 0;
-            z-index: 20;
+            z-index: 5;
             pointer-events: none;
         }
 
-        /* --- 場景 3: 最終內容 --- */
-        #final-content {
+        /* 頂層：合照與文字 */
+        #photo-reveal {
             position: absolute;
             inset: 0;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 150;
+            z-index: 100; /* 確保最高 */
             opacity: 0;
-            transform: scale(0.8);
-            transition: all 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(0.9);
+            transition: opacity 3s ease, transform 3s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
         }
 
-        #final-content.show {
+        #photo-reveal.active {
             opacity: 1;
             transform: scale(1);
             pointer-events: auto;
         }
 
-        .photo-arch {
-            width: 80vw;
-            max-width: 450px;
-            aspect-ratio: 4 / 5;
-            border-radius: 225px 225px 20px 20px;
-            border: 8px solid #fff;
-            box-shadow: 0 0 70px rgba(255, 215, 0, 0.8);
+        .photo-frame {
+            width: 85vw;
+            max-width: 500px;
+            box-shadow: 0 20px 70px rgba(0, 0, 0, 0.8);
+            border: 10px solid #fff;
+            border-radius: 4px;
             overflow: hidden;
-            position: relative;
-            background: #222;
+            background: #111;
         }
 
-        .photo-arch img {
+        .photo-frame img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
             display: block;
         }
 
-        .banner-text {
-            margin-top: -35px;
-            z-index: 160;
-            background: linear-gradient(to bottom, #fff7ad, #ffca00);
-            border: 4px solid #fff;
-            border-radius: 60px;
-            padding: 15px 50px;
-            color: #7a0000;
+        .anniversary-text {
+            margin-top: 30px;
+            color: #fff;
             font-size: 2.2rem;
-            font-weight: bold;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            font-weight: 300;
+            letter-spacing: 0.1rem;
+            text-shadow: 0 0 20px rgba(0,0,0,1);
             text-align: center;
-            white-space: nowrap;
         }
 
         @media (max-width: 600px) {
-            .banner-text { font-size: 1.4rem; padding: 10px 25px; margin-top: -20px; }
-            .photo-arch { width: 90vw; }
+            .anniversary-text { font-size: 1.5rem; }
+            .password-container h1 { font-size: 1.2rem; }
+            .photo-frame { width: 90vw; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. 密碼輸入 -->
-    <div id="password-scene">
-        <div class="password-panel">
-            <h2>✨ 請輸入紀念日密碼 ✨</h2>
+    <div id="password-overlay">
+        <div class="password-container">
+            <h1>Enter our secret number</h1>
             <div class="input-group">
-                <input type="password" maxlength="1" class="digit-input" autofocus>
-                <input type="password" maxlength="1" class="digit-input">
-                <input type="password" maxlength="1" class="digit-input">
-                <input type="password" maxlength="1" class="digit-input">
+                <input type="password" maxlength="1" class="digit-input" autofocus autocomplete="off">
+                <input type="password" maxlength="1" class="digit-input" autocomplete="off">
+                <input type="password" maxlength="1" class="digit-input" autocomplete="off">
+                <input type="password" maxlength="1" class="digit-input" autocomplete="off">
             </div>
         </div>
     </div>
 
-    <!-- 2. 舞台場景 -->
-    <div id="stage-scene">
-        <div class="stage-background"></div>
-        
+    <div id="main-content">
+        <div class="sky-background"></div>
         <canvas id="fireworks"></canvas>
-
-        <div class="curtain-container">
-            <div class="curtain-half curtain-left" id="c-left">
-                <img src="Gemini_Generated_Image_186xyo186xyo186x (1).jpg" class="curtain-img">
+        
+        <div id="photo-reveal">
+            <div class="photo-frame">
+                <img src="未命名設計.jpg" alt="100 Days Celebration">
             </div>
-            <div class="curtain-half curtain-right" id="c-right">
-                <img src="Gemini_Generated_Image_186xyo186xyo186x (1).jpg" class="curtain-img">
-            </div>
-        </div>
-
-        <!-- 3. 最終展示 (合照) -->
-        <div id="final-content">
-            <div class="photo-arch">
-                <img src="WhatsApp Image 2026-03-29 at 13.35.51.jpeg" alt="我們的合照">
-            </div>
-            <div class="banner-text">感謝有你的100天</div>
+            <div class="anniversary-text">100 days with you</div>
         </div>
     </div>
 
     <script>
         const inputs = document.querySelectorAll('.digit-input');
-        const correctPassword = '1225';
+        const correctPassword = '1225'; // 您的紀念日密碼
 
-        // 處理輸入邏輯
+        // 密碼輸入邏輯
         inputs.forEach((input, index) => {
             input.addEventListener('input', (e) => {
-                if (e.target.value.length === 1 && index < inputs.length - 1) {
+                if (e.target.value && index < inputs.length - 1) {
                     inputs[index + 1].focus();
                 }
-                const pw = Array.from(inputs).map(i => i.value).join('');
-                if (pw.length === 4) {
-                    if (pw === correctPassword) {
-                        startSequence();
-                    } else {
-                        setTimeout(() => inputs.forEach(i => i.value = ''), 500);
-                        inputs[0].focus();
-                    }
-                }
+                checkPassword();
             });
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Backspace' && !e.target.value && index > 0) {
@@ -263,22 +198,38 @@
             });
         });
 
-        function startSequence() {
-            document.getElementById('password-scene').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('password-scene').style.display = 'none';
-                document.getElementById('stage-scene').style.display = 'block';
-                
-                // 拉開布幕特效
+        function checkPassword() {
+            const pw = Array.from(inputs).map(i => i.value).join('');
+            if (pw === correctPassword) {
+                unlockSite();
+            } else if (pw.length === 4) {
                 setTimeout(() => {
-                    document.getElementById('c-left').classList.add('open');
-                    document.getElementById('c-right').classList.add('open');
-                    initFireworks();
-                }, 300);
+                    inputs.forEach(i => i.value = '');
+                    inputs[0].focus();
+                }, 500);
+            }
+        }
+
+        function unlockSite() {
+            const overlay = document.getElementById('password-overlay');
+            const content = document.getElementById('main-content');
+            
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                content.style.display = 'block';
+                
+                // 啟動煙花
+                initFireworks();
+
+                // 5 秒後顯示合照 (與煙花綻放配合)
+                setTimeout(() => {
+                    document.getElementById('photo-reveal').classList.add('active');
+                }, 5000);
             }, 1500);
         }
 
-        // --- 煙花系統 (高頻率與大規模版) ---
+        // --- 煙花特效系統 ---
         const canvas = document.getElementById('fireworks');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -293,24 +244,16 @@
             resize();
             animate();
             
-            // 提高背景常規煙花的出現頻率 (從 800ms 縮短到 400ms)
-            const interval = setInterval(() => {
-                // 每次觸發隨機生成 1 到 2 個煙花
+            // 背景常規煙花 (維持高頻率)
+            setInterval(() => {
                 createExplosion(false);
                 if(Math.random() > 0.5) createExplosion(false);
             }, 400);
 
-            // 5 秒後中央大爆炸，隨後顯示合照
-            setTimeout(() => {
-                // 中央生成三個不同顏色的超大爆炸，讓效果更厚實
+            // 中央較大型煙花 (每 6 秒一次)
+            setInterval(() => {
                 createExplosion(true);
-                setTimeout(() => createExplosion(true), 200);
-                setTimeout(() => createExplosion(true), 400);
-
-                setTimeout(() => {
-                    document.getElementById('final-content').classList.add('show');
-                }, 1500);
-            }, 5000);
+            }, 6000);
         }
 
         class Particle {
@@ -322,10 +265,9 @@
                 this.vy = Math.sin(angle) * speed;
                 this.alpha = 1;
                 this.friction = 0.96;
-                this.gravity = 0.04;
+                this.gravity = 0.06;
                 this.size = size;
-                // 保持 5 秒漸變消失
-                this.decay = 0.0033;
+                this.decay = 0.0045; // 粒子慢慢淡出
             }
             draw() {
                 ctx.save();
@@ -333,7 +275,7 @@
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fillStyle = this.color;
-                ctx.shadowBlur = 12;
+                ctx.shadowBlur = 10;
                 ctx.shadowColor = this.color;
                 ctx.fill();
                 ctx.restore();
@@ -350,24 +292,23 @@
 
         function createExplosion(isBig) {
             const x = isBig ? canvas.width / 2 : Math.random() * canvas.width;
-            const y = isBig ? canvas.height * 0.45 : Math.random() * (canvas.height * 0.7);
+            const y = isBig ? canvas.height * 0.45 : Math.random() * (canvas.height * 0.65);
             const hue = Math.random() * 360;
             const color = `hsl(${hue}, 100%, 75%)`;
             
-            // 粒子數量與大小
-            const count = isBig ? 700 : 250; 
-            const baseSize = isBig ? 5 : 3.5;
+            const count = isBig ? 250 : 100; 
+            const baseSize = isBig ? 4.5 : 2.5;
 
             for (let i = 0; i < count; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * (isBig ? 24 : 12) + 2;
+                const speed = Math.random() * (isBig ? 18 : 10) + 1;
                 particles.push(new Particle(x, y, color, speed, angle, baseSize));
             }
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             for (let i = particles.length - 1; i >= 0; i--) {
