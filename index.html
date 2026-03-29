@@ -3,153 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>100 Days With You</title>
+    <title>100 Days With You - Perfect Wave Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --jp-font: 'Noto Serif JP', serif;
-            --primary-gold: #ffd700;
-        }
+        :root { --jp-font: 'Noto Serif JP', serif; --primary-gold: #ffd700; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #000; font-family: var(--jp-font); }
+        
+        #password-overlay { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #0a0a0a; z-index: 9999; transition: opacity 1.5s ease; }
+        .password-container { text-align: center; color: #fff; }
+        .password-container h1 { font-weight: 300; letter-spacing: 0.15rem; margin-bottom: 40px; font-size: 1.6rem; color: rgba(255, 255, 255, 0.8); }
+        .input-group { display: flex; gap: 12px; justify-content: center; }
+        .digit-input { width: 45px; height: 60px; background: transparent; border: none; border-bottom: 1.5px solid rgba(255, 255, 255, 0.3); color: var(--primary-gold); font-size: 32px; text-align: center; outline: none; transition: all 0.3s; }
+        .digit-input:focus { border-bottom-color: var(--primary-gold); transform: translateY(-3px); }
+        
+        #main-content { position: fixed; inset: 0; display: none; z-index: 10; }
+        .sky-background { position: absolute; inset: 0; background: url('phil-botha-a0TJ3hy-UD8-unsplash.jpg') center/cover no-repeat; z-index: 1; }
+        canvas#fireworks { position: absolute; inset: 0; z-index: 5; pointer-events: none; mix-blend-mode: screen; }
+        
+        #photo-reveal { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; opacity: 0; transform: scale(0.9); transition: opacity 2s ease, transform 2s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; }
+        #photo-reveal.active { opacity: 1; transform: scale(1); pointer-events: auto; }
+        .photo-frame { width: 85vw; max-width: 500px; }
+        .photo-frame img { width: 100%; height: auto; display: block; }
+        .anniversary-text { margin-top: 30px; color: #fff; font-size: 2.2rem; font-weight: 300; text-align: center; text-shadow: 0 0 20px rgba(0,0,0,0.8); }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        .poke-firework {
+            position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 6;
+            width: 180px; height: 180px; display: flex; justify-content: center; align-items: center;
         }
+        .poke-firework img { width: 100%; height: 100%; object-fit: contain; animation: neonReveal 4.0s ease-out forwards; }
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-            font-family: var(--jp-font);
-        }
-
-        /* --- 1. 密碼頁面 (最上層) --- */
-        #password-overlay {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: #0a0a0a;
-            z-index: 9999;
-            transition: opacity 1.5s ease;
-        }
-
-        .password-container {
-            text-align: center;
-            color: #fff;
-        }
-
-        .password-container h1 {
-            font-weight: 300;
-            letter-spacing: 0.15rem;
-            margin-bottom: 40px;
-            font-size: 1.6rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .digit-input {
-            width: 45px;
-            height: 60px;
-            background: transparent;
-            border: none;
-            border-bottom: 1.5px solid rgba(255, 255, 255, 0.3);
-            color: var(--primary-gold);
-            font-size: 32px;
-            text-align: center;
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .digit-input:focus {
-            border-bottom-color: var(--primary-gold);
-            transform: translateY(-3px);
-        }
-
-        /* --- 2. 主內容層級 --- */
-        #main-content {
-            position: fixed;
-            inset: 0;
-            display: none;
-            z-index: 10;
-        }
-
-        /* 底層：星空背景 */
-        .sky-background {
-            position: absolute;
-            inset: 0;
-            background: url('phil-botha-a0TJ3hy-UD8-unsplash.jpg') center/cover no-repeat;
-            z-index: 1;
-        }
-
-        /* 中層：煙花畫布 */
-        canvas#fireworks {
-            position: absolute;
-            inset: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        /* 頂層：合照與文字 */
-        #photo-reveal {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100; /* 確保最高 */
-            opacity: 0;
-            transform: scale(0.9);
-            transition: opacity 3s ease, transform 3s cubic-bezier(0.16, 1, 0.3, 1);
-            pointer-events: none;
-        }
-
-        #photo-reveal.active {
-            opacity: 1;
-            transform: scale(1);
-            pointer-events: auto;
-        }
-
-        .photo-frame {
-            width: 85vw;
-            max-width: 500px;
-            box-shadow: 0 20px 70px rgba(0, 0, 0, 0.8);
-            border: 10px solid #fff;
-            border-radius: 4px;
-            overflow: hidden;
-            background: #111;
-        }
-
-        .photo-frame img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .anniversary-text {
-            margin-top: 30px;
-            color: #fff;
-            font-size: 2.2rem;
-            font-weight: 300;
-            letter-spacing: 0.1rem;
-            text-shadow: 0 0 20px rgba(0,0,0,1);
-            text-align: center;
-        }
-
-        @media (max-width: 600px) {
-            .anniversary-text { font-size: 1.5rem; }
-            .password-container h1 { font-size: 1.2rem; }
-            .photo-frame { width: 90vw; }
+        @keyframes neonReveal {
+            0% { opacity: 0; transform: scale(0.5); filter: brightness(0) drop-shadow(0 0 5px #fff) drop-shadow(0 0 15px var(--primary-gold)); }
+            15% { opacity: 1; transform: scale(1.1); filter: brightness(0) drop-shadow(0 0 10px #fff) drop-shadow(0 0 30px var(--primary-gold)); }
+            60% { filter: brightness(3) drop-shadow(0 0 0px transparent); transform: scale(1); opacity: 1; }
+            80% { filter: brightness(1); transform: scale(1); opacity: 1; }
+            100% { opacity: 0; transform: scale(1.05); }
         }
     </style>
 </head>
@@ -170,153 +59,231 @@
     <div id="main-content">
         <div class="sky-background"></div>
         <canvas id="fireworks"></canvas>
-        
         <div id="photo-reveal">
-            <div class="photo-frame">
-                <img src="未命名設計.jpg" alt="100 Days Celebration">
-            </div>
+            <div class="photo-frame"><img src="photo.png" alt="100 Days Photo"></div>
             <div class="anniversary-text">100 days with you</div>
         </div>
     </div>
 
     <script>
         const inputs = document.querySelectorAll('.digit-input');
-        const correctPassword = '1225'; // 您的紀念日密碼
+        const correctPassword = '1225'; 
+        const FireworkColors = [
+            { center: '#FFFFFF', mid: '#FF4D4D', end: '#FFB3B3' }, 
+            { center: '#FFFFFF', mid: '#FFA500', end: '#FFD9B3' }, 
+            { center: '#FFFFFF', mid: '#FFFF00', end: '#FFFFB3' }, 
+            { center: '#FFFFFF', mid: '#32CD32', end: '#B3FFB3' }, 
+            { center: '#FFFFFF', mid: '#00BFFF', end: '#B3E5FC' }, 
+            { center: '#FFFFFF', mid: '#9370DB', end: '#D1C4E9' }, 
+            { center: '#FFFFFF', mid: '#FFD700', end: '#FFF4B3' }  
+        ];
 
-        // 密碼輸入邏輯
-        inputs.forEach((input, index) => {
-            input.addEventListener('input', (e) => {
-                if (e.target.value && index < inputs.length - 1) {
-                    inputs[index + 1].focus();
-                }
-                checkPassword();
-            });
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && !e.target.value && index > 0) {
-                    inputs[index - 1].focus();
-                }
-            });
-        });
+        let lastColorIndices = [-1, -1];
+        let lastPicIndex = -1;
+        
+        const picImages = [
+            '7a2bec0dd522d66353f0cf3df9148070456a3349.png',
+            'image_1.png',
+	    'dio.png',
+	    'kirby.png',
+	    'WhatsApp Image 2026-03-30 at 02.26.58 (1).jpeg',
+	    'WhatsApp Image 2026-03-30 at 02.26.58 (2).jpeg',
+	    'WhatsApp Image 2026-03-30 at 02.26.58 (3).jpeg',
+	    'WhatsApp Image 2026-03-30 at 02.26.58 (4).jpeg',
+	    'WhatsApp Image 2026-03-30 at 02.26.58 (5).jpeg',
+	    'capoo.gif',
+            'image_17.png',
+            'image_18.png'
+        ];
 
-        function checkPassword() {
-            const pw = Array.from(inputs).map(i => i.value).join('');
-            if (pw === correctPassword) {
-                unlockSite();
-            } else if (pw.length === 4) {
-                setTimeout(() => {
-                    inputs.forEach(i => i.value = '');
-                    inputs[0].focus();
-                }, 500);
-            }
+        function spawnPictureDOM(x, y, imgSrc) {
+            const container = document.getElementById('main-content');
+            const picDiv = document.createElement('div');
+            picDiv.className = 'poke-firework';
+            picDiv.style.left = x + 'px';
+            picDiv.style.top = y + 'px';
+            const img = document.createElement('img');
+            img.src = imgSrc;
+            picDiv.appendChild(img);
+            container.appendChild(picDiv);
+            setTimeout(() => picDiv.remove(), 4000);
         }
 
-        function unlockSite() {
-            const overlay = document.getElementById('password-overlay');
-            const content = document.getElementById('main-content');
-            
-            overlay.style.opacity = '0';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                content.style.display = 'block';
-                
-                // 啟動煙花
-                initFireworks();
+        function getUniqueRandomColor() {
+            let index; do { index = Math.floor(Math.random() * FireworkColors.length); } while (lastColorIndices.includes(index));
+            lastColorIndices.shift(); lastColorIndices.push(index);
+            return FireworkColors[index];
+        }
 
-                // 5 秒後顯示合照 (與煙花綻放配合)
-                setTimeout(() => {
-                    document.getElementById('photo-reveal').classList.add('active');
-                }, 5000);
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => { if (e.target.value && index < inputs.length - 1) inputs[index + 1].focus(); checkPassword(); });
+            input.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && !e.target.value && index > 0) inputs[index - 1].focus(); });
+        });
+
+        function checkPassword() { if (Array.from(inputs).map(i => i.value).join('') === correctPassword) unlock(); }
+
+        function unlock() {
+            document.getElementById('password-overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('password-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                initFireworks();
+                setTimeout(() => fireworkTimeline.firstWave(), 100);
             }, 1500);
         }
 
-        // --- 煙花特效系統 ---
-        const canvas = document.getElementById('fireworks');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
+        const fireworkTimeline = {
+             routineInterval: null,
+             RoutineFrequencyMs: 800,
 
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+             firstWave() {
+                const positions = [
+                    {x: 0.15, y: 0.3}, {x: 0.35, y: 0.25}, {x: 0.5, y: 0.35}, {x: 0.65, y: 0.25}, {x: 0.85, y: 0.3},
+                    {x: 0.25, y: 0.45}, {x: 0.4, y: 0.5}, {x: 0.6, y: 0.5}, {x: 0.75, y: 0.45},
+                    {x: 0.2, y: 0.2}, {x: 0.5, y: 0.2}, {x: 0.8, y: 0.2}
+                ];
+                positions.forEach((pos, index) => {
+                    const x = canvas.width * pos.x; const y = canvas.height * pos.y;
+                    // 速度調整：2300ms (慢速升空)
+                    launchSingleFirework(x, canvas.height, x, y, true, 850, 2300, false, 2.2, 1.0, 0.0075, FireworkColors[index % FireworkColors.length], false);
+                });
+                setTimeout(() => this.launchGrandFinale(), 4500);
+             },
+
+             launchGrandFinale() {
+                const centerX = canvas.width / 2;
+                const targetY = canvas.height * 0.45;
+                const flowerRadius = canvas.width * 0.22;
+                const flowerPetalCount = 10;
+                for (let i = 0; i < flowerPetalCount; i++) {
+                    const angle = (i / flowerPetalCount) * Math.PI * 2;
+                    const targetX = centerX + Math.cos(angle) * flowerRadius;
+                    const petalTargetY = targetY + Math.sin(angle) * flowerRadius * 0.7;
+                    const colorSet = FireworkColors[i % FireworkColors.length];
+                    // 速度調整：2300ms (慢速升空)
+                    launchSingleFirework(centerX, canvas.height, targetX, petalTargetY, true, 850, 2300, false, 2.2, 1.0, 0.0075, colorSet, false);
+                }
+                setTimeout(() => {
+                    document.getElementById('photo-reveal').classList.add('active');
+                    this.startRoutineFrequency();
+                }, 4500);
+             },
+
+             startRoutineFrequency() {
+                if (this.routineInterval) clearInterval(this.routineInterval);
+                this.routineInterval = setInterval(() => {
+                    const isPictureEffect = Math.random() < 0.3; 
+                    let x, y;
+                    if (isPictureEffect) {
+                        const isLeft = Math.random() < 0.5;
+                        x = isLeft ? canvas.width * (0.05 + Math.random() * 0.25) : canvas.width * (0.70 + Math.random() * 0.25);
+                        y = canvas.height * (0.1 + Math.random() * 0.4);
+                        let picIndex;
+                        do { picIndex = Math.floor(Math.random() * picImages.length); } while (picIndex === lastPicIndex);
+                        lastPicIndex = picIndex;
+                        // 速度調整：2000ms
+                        launchSingleFirework(x, canvas.height, x, y, false, 50, 2000, false, 1.0, 1.0, 0.01, getUniqueRandomColor(), picImages[picIndex]);
+                    } else {
+                        x = canvas.width * (0.1 + Math.random() * 0.8);
+                        y = canvas.height * (0.1 + Math.random() * 0.4);
+                        const sizeScale = Math.random() > 0.5 ? 4.0 : 3.2;
+                        // 速度調整：3000ms (極慢速)
+                        launchSingleFirework(x, canvas.height, x, y, true, 1100, 3000, false, sizeScale, 0.24, 0.005, getUniqueRandomColor(), false);
+                    }
+                }, this.RoutineFrequencyMs);
+             }
+        };
+
+        const canvas = document.getElementById('fireworks'); const ctx = canvas.getContext('2d');
+        let fireworkRockets = []; let particles = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize);
 
-        function initFireworks() {
-            resize();
-            animate();
-            
-            // 背景常規煙花 (維持高頻率)
-            setInterval(() => {
-                createExplosion(false);
-                if(Math.random() > 0.5) createExplosion(false);
-            }, 400);
+        function drawHeart(ctx, x, y, size, color, isFlickering) {
+            ctx.save(); ctx.translate(x, y);
+            const flickerScale = isFlickering ? (Math.random() * 0.4 + 0.8) : 1;
+            ctx.scale((size / 10) * flickerScale, (size / 10) * flickerScale);
+            ctx.beginPath(); ctx.moveTo(0, 3);
+            ctx.bezierCurveTo(-2, -1, -7, -1, -7, 4); ctx.bezierCurveTo(-7, 9, -2, 12, 0, 15);
+            ctx.bezierCurveTo(2, 12, 7, 9, 7, 4); ctx.bezierCurveTo(7, -1, 2, -1, 0, 3);
+            ctx.closePath(); ctx.rotate(Math.PI); 
+            ctx.fillStyle = isFlickering && Math.random() > 0.8 ? '#fff' : color;
+            ctx.fill(); ctx.restore();
+        }
 
-            // 中央較大型煙花 (每 6 秒一次)
-            setInterval(() => {
-                createExplosion(true);
-            }, 6000);
+        class FireworkRocket {
+            constructor(startX, startY, targetX, targetY, isBig, pCount, liftMs, isTrigger, sMult, spMult, decay, fixedColor = null, pokeImg = false) {
+                this.x = startX; this.y = startY; this.targetY = targetY; this.targetX = targetX;
+                this.isBig = isBig; this.pCount = pCount; this.isTrigger = isTrigger;
+                this.sMult = sMult; this.spMult = spMult; this.decay = decay; this.pokeImg = pokeImg;
+                this.speed = Math.sqrt(Math.pow(startX-targetX,2)+Math.pow(startY-targetY,2))/(liftMs/1000*60);
+                this.angle = Math.atan2(targetY - startY, targetX - startX);
+                this.colorSet = fixedColor || getUniqueRandomColor();
+            }
+            update(index) {
+                this.x += Math.cos(this.angle)*this.speed; this.y += Math.sin(this.angle)*this.speed;
+                if (Math.abs(this.y - this.targetY) < this.speed || this.y <= this.targetY) {
+                    if (this.pokeImg) {
+                        spawnPictureDOM(this.targetX, this.targetY, this.pokeImg);
+                        createExplosion(this.targetX, this.targetY, this.colorSet, false, 40, 0.8, 0.5, this.decay);
+                    } else {
+                        createExplosion(this.targetX, this.targetY, this.colorSet, this.isBig, this.pCount, this.sMult, this.spMult, this.decay);
+                    }
+                    fireworkRockets.splice(index, 1);
+                }
+            }
+            draw() { drawHeart(ctx, this.x, this.y, 8, this.colorSet.mid, true); }
         }
 
         class Particle {
-            constructor(x, y, color, speed, angle, size) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed;
-                this.alpha = 1;
-                this.friction = 0.96;
-                this.gravity = 0.06;
-                this.size = size;
-                this.decay = 0.0045; // 粒子慢慢淡出
-            }
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = this.alpha;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = this.color;
-                ctx.fill();
-                ctx.restore();
+            constructor(x, y, colorSet, vx, vy, size, decay) {
+                this.x = x; this.y = y; this.colorSet = colorSet;
+                this.vx = vx; this.vy = vy; this.friction = 0.982; this.gravity = 0.015;
+                this.alpha = 1; this.size = size; this.decay = decay; 
             }
             update() {
-                this.vx *= this.friction;
-                this.vy *= this.friction;
-                this.vy += this.gravity;
-                this.x += this.vx;
-                this.y += this.vy;
-                this.alpha -= this.decay;
+                this.vx *= this.friction; this.vy *= this.friction; this.vy += this.gravity;
+                this.x += this.vx; this.y += this.vy; this.alpha -= this.decay;
+            }
+            draw() {
+                if (this.alpha <= 0) return;
+                ctx.save(); ctx.globalAlpha = this.alpha;
+                ctx.beginPath(); ctx.lineWidth = this.size * 2.5; ctx.strokeStyle = this.colorSet.mid; ctx.lineCap = 'round';
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x - this.vx * 3, this.y - this.vy * 3);
+                ctx.stroke();
+                if (this.alpha > 0.2) {
+                    ctx.beginPath(); ctx.lineWidth = this.size * 0.7 * this.alpha; ctx.strokeStyle = this.colorSet.center;
+                    ctx.moveTo(this.x, this.y); ctx.lineTo(this.x - this.vx * 2, this.y - this.vy * 2);
+                    ctx.stroke();
+                }
+                ctx.restore();
             }
         }
 
-        function createExplosion(isBig) {
-            const x = isBig ? canvas.width / 2 : Math.random() * canvas.width;
-            const y = isBig ? canvas.height * 0.45 : Math.random() * (canvas.height * 0.65);
-            const hue = Math.random() * 360;
-            const color = `hsl(${hue}, 100%, 75%)`;
-            
-            const count = isBig ? 250 : 100; 
-            const baseSize = isBig ? 4.5 : 2.5;
+        function launchSingleFirework(sX, sY, tX, tY, isB, pC, lM, isT, sM, spM, dec, color = null, pokeImg = false) {
+             fireworkRockets.push(new FireworkRocket(sX, sY, tX, tY, isB, pC, lM, isT, sM, spM, dec, color, pokeImg));
+        }
 
-            for (let i = 0; i < count; i++) {
+        function createExplosion(x, y, colorSet, isBig, pCount, sMult, spMult, decay) {
+            for (let i = 0; i < pCount; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * (isBig ? 18 : 10) + 1;
-                particles.push(new Particle(x, y, color, speed, angle, baseSize));
+                const speed = (Math.random() * (isBig ? 12 : 7) + 2) * sMult;
+                particles.push(new Particle(x, y, colorSet, Math.cos(angle)*speed*0.4*spMult, Math.sin(angle)*speed*0.4*spMult, (isBig ? 0.8 : 0.5)*sMult, decay));
             }
         }
 
+        function initFireworks() { resize(); animate(); }
         function animate() {
             requestAnimationFrame(animate);
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.18)'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+            ctx.globalCompositeOperation = 'screen';
+            for (let i = fireworkRockets.length - 1; i >= 0; i--) fireworkRockets[i].update(i), fireworkRockets[i].draw();
             for (let i = particles.length - 1; i >= 0; i--) {
-                particles[i].update();
-                particles[i].draw();
-                if (particles[i].alpha <= 0) {
-                    particles.splice(i, 1);
-                }
+                particles[i].update(); particles[i].draw();
+                if (particles[i].alpha <= 0) particles.splice(i, 1);
             }
         }
     </script>
